@@ -1,13 +1,21 @@
 import requests
 
-def fetch_headers(url):
+def fetch_headers(url, timeout=5):
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
+
     try:
-        response = requests.get(url, timeout=5)
-        return response.headers
-    except requests.RequestException as e:
-        print(f"Error fetching headers for {url}: {e}")
-        return None
-
-
-if __name__ == "__main__":
-    print(fetch_headers("https://example.com")) 
+        response = requests.get(url, timeout=timeout)
+        return {
+            "success": True,
+            "status_code": response.status_code,
+            "headers": dict(response.headers),
+            "error": None,
+        }
+    except requests.exceptions.RequestException as e:
+        return {
+            "success": False,
+            "status_code": None,
+            "headers": {},
+            "error": str(e),
+        }
